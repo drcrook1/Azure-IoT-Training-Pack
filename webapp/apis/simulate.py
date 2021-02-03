@@ -3,7 +3,6 @@ import simplejson
 
 simulate = Blueprint('simulate', __name__, url_prefix='/api/simulate')
 
-
 @simulate.route('/leafdevice', methods=['POST'])
 def simulate_leaf_device():
     '''
