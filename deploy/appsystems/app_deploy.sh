@@ -22,3 +22,7 @@ cecho ()                     # Color-echo.
 
 #Deploy baseline infrastructure
 cecho "TEMPORARY - DEPLOYING APPS ON TOP OF INFRA" $magenta
+
+#
+# Deploy web app to AKS
+#

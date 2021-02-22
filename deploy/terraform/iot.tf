@@ -10,7 +10,7 @@ resource "azurerm_iothub_dps" "ftaiotdps" {
 
   linked_hub {
     connection_string = "HostName=${azurerm_iothub.ftaiothub1.hostname};SharedAccessKeyName=iothubowner;SharedAccessKey=${azurerm_iothub.ftaiothub1.shared_access_policy.0.primary_key}"
-    location = azurerm_iothub.ftaiothub1.location
+    location          = azurerm_iothub.ftaiothub1.location
   }
 }
 

@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Values.names.ingress }}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: {{ .Values.names.cert_issuer }}
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.web_app.fqdn }}
+    - {{ .Values.web_app.fqdntwo }}
+    secretName: {{ .Values.cert_issuer.tls_secret_name }}
+  rules:
+  - host: {{ .Values.web_app.fqdn }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ .Values.names.service }}
+          servicePort: 80
+  - host: {{ .Values.web_app.fqdntwo }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ .Values.names.service }}
+          servicePort: 80          

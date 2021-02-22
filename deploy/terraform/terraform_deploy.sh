@@ -20,11 +20,6 @@ cecho ()                     # Color-echo.
   return
 }
 
-export TF_VAR_location="$TARGET_LOCATION"
-export TF_VAR_environment="$TARGET_ENV"
-export TF_VAR_sqluser="$SQL_USERNAME"
-export TF_VAR_sqlpassword="$SQL_PASSWORD"
-
 #
 # This is the simplest way to set it up, not secure or whatever, but works for an open sourced example.
 #
@@ -37,3 +32,7 @@ cecho "Completed Terraform Plan..." $green
 cecho "Starting Terraform Apply..." $magenta
 terraform apply -state=/mnt/tfstate/terraform.tfstate -auto-approve "tfplan.out"
 cecho "Completed Terraform Apply..." $green
+
+cecho "Writing Key Outputs to Files for next stages" $green
+mkdir -p ~/.kube
+terraform output kube_config >> ~/.kube/config

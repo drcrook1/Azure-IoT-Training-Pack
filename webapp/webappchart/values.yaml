@@ -1,0 +1,26 @@
+# Default values for webappchart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicas: 1
+
+cert_issuer:
+  email: "dacrook@microsoft.com"
+  tls_secret_name: "ftaiot-prod"
+  server: "https://acme-staging-v02.api.letsencrypt.org/directory"
+
+web_app:
+  fqdn: "ftaiot.eastus.cloudapp.azure.com"
+  fqdntwo: "www.ftaiot.eastus.cloudapp.azure.com"
+  version: 1
+  image: "ftaiot.azurecr.io/ftaiot"
+  env:
+    MONGO_CONN_STRING: "mongodb://ftaiot:David!234567890@mongo-db-mongodb.default.svc.cluster.local:27017"
+    SECRET_KEY: "DEV_SECRETS"
+names:
+  deployment: "ftaiotdeployment"
+  service: "ftaiotservice"
+  ingress: "ftaiotingress"
+  containers: "ftaiotcontainers"
+  cert_issuer: "ftaiotcert_issuer"
+  host: "ftaiot.eastus.cloudapp.azure.com"

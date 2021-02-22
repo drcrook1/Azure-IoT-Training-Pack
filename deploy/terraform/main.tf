@@ -7,21 +7,21 @@ terraform {
       version = ">=2.46.0"
     }
     helm = {
-      source = "hashicorp/helm"
+      source  = "hashicorp/helm"
       version = ">=2.0.0"
     }
     kubernetes = {
-      source = "hashicorp/kubernetes"
+      source  = "hashicorp/kubernetes"
       version = ">=2.0.0"
     }
   }
 }
 
 provider "azurerm" {
-    features {}
+  features {}
 }
 
 resource "azurerm_resource_group" "rg" {
-  name      = "ftaiot-${var.environment}"
-  location  = var.location
+  name     = "ftaiot-${var.environment}"
+  location = var.location
 }
