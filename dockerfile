@@ -2,7 +2,7 @@
 #       START SECTION 0              #
 #       BASIC DEPENDENCIES           #
 ######################################
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 RUN apt-get clean -y
 RUN apt-get update -y
@@ -13,10 +13,11 @@ RUN apt-get install wget gnupg curl unzip jq apt-transport-https dos2unix zip -y
 #       START SECTION 1              #
 #       INSTALL TERRAFORM            #
 ######################################
-ENV TERRAFORM_VERSION="0.12.23"
+ENV TERRAFORM_VERSION="0.14.7"
 RUN wget "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
 RUN unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
 RUN mv terraform /bin
+RUN chmod -R a+x /bin/*
 
 ######################################
 #       START SECTION 2              #
@@ -89,6 +90,12 @@ RUN find /app/deploy -type f -print0 | xargs -0 -n 1 -P 4 dos2unix
 
 ######################################
 #       START SECTION 6              #
+#       EVERYTHING +x                #
+######################################
+RUN chmod -x -R /app/*
+
+######################################
+#       START SECTION 7              #
 #       RUN COMMAND                  #
 ######################################
 WORKDIR /app/deploy
