@@ -61,7 +61,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "base" {
   enable_auto_scaling   = true
   max_count             = 3
   min_count             = 1
-  node_count            = 3
+  node_count            = 10
   mode                  = "User"
   vnet_subnet_id        = azurerm_subnet.base.id
   tags                  = var.tags
