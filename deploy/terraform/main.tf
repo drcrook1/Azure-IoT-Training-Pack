@@ -1,27 +1,28 @@
-terraform {
-  required_version = ">= 0.14"
+###
+# environment composition
+###
 
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">=2.46.0"
-    }
-    helm = {
-      source  = "hashicorp/helm"
-      version = ">=2.0.0"
-    }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = ">=2.0.0"
-    }
-  }
+module "backend" {
+  source                       = "./modules/backend"
+  environment                  = var.environment
+  region                       = var.region
+  tags                         = var.tags
+  administrator_login          = var.administrator_login
+  administrator_login_password = var.administrator_login_password
 }
 
-provider "azurerm" {
-  features {}
+module "iot" {
+  source      = "./modules/iot"
+  environment = var.environment
+  region      = var.region
+  tags        = var.tags
 }
 
-resource "azurerm_resource_group" "rg" {
-  name     = "ftaiot-${var.environment}"
-  location = var.location
+module "kubernetes" {
+  source           = "./modules/kubernetes"
+  environment      = var.environment
+  region           = var.region
+  tags             = var.tags
+  address_space    = var.address_space
+  address_prefixes = var.address_prefixes
 }
