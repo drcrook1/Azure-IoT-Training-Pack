@@ -39,7 +39,10 @@ resource "azurerm_kubernetes_cluster" "base" {
     only_critical_addons_enabled = true
     vm_size                      = var.vm_size
     availability_zones           = [1, 2, 3]
-    node_count                   = 3
+    enable_auto_scaling          = true
+    max_count                    = 3
+    min_count                    = 1
+    node_count                   = 2
     vnet_subnet_id               = azurerm_subnet.base.id
     tags                         = var.tags
   }
@@ -59,9 +62,9 @@ resource "azurerm_kubernetes_cluster_node_pool" "base" {
   vm_size               = var.vm_size
   availability_zones    = [1, 2, 3]
   enable_auto_scaling   = true
-  max_count             = 3
+  max_count             = 10
   min_count             = 1
-  node_count            = 10
+  node_count            = 1
   mode                  = "User"
   vnet_subnet_id        = azurerm_subnet.base.id
   tags                  = var.tags

@@ -23,11 +23,6 @@ variable "administrator_login" {
   type        = string
 }
 
-variable "administrator_login_password" {
-  description = "(Required) The password associated with the administrator_login user. Needs to comply with Azure's Password Policy"
-  type        = string
-}
-
 #vnet
 
 variable "address_space" {
