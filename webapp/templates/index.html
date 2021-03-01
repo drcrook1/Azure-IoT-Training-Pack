@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block pagescripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/index.js') }}" ></script>
+    <script type="text/javascript">
+        var add_device_endpoint =  "{{ url_for('simulate.create_leaf_device') }}";
+    </script>
+{% endblock %}
+
+
+{% block content %}
+<section class="page-header page-header-xs">
+                <div class="container">
+                        <h1>SIMULATION MANAGER</h1>
+                </div>
+</section>
+
+    <div class="container margin-top-60 margin-bottom-60">
+
+        <div class="col-lg-12 col-md-12 col-sm-12 margin-bottom-80">            
+
+            </iframe>
+
+            <ul class="nav nav-tabs nav-top-border">
+                <li class="active"><a href="#devices" data-toggle="tab" aria-expanded="true">Devices</a></li>
+                <li class=""><a href="#simregion" data-toggle="tab" aria-expanded="false">Sim Region</a></li>
+                <li class=""><a href="#iothubs" data-toggle="tab" aria-expanded="false">IoT Hubs</a></li>
+            </ul>
+
+            <div class="tab-content margin-top-20">
+                <!-- Devices TAB -->
+                <div class="tab-pane fade in active" id="devices">
+
+                    <div class="row">
+                        <div class="panel panel-success">
+                            <div class="panel-heading">
+                                    <h2 class="panel-title"><strong>Devices</strong>: <text data-bind="text: num_leaf_devices"></text></h2>
+                            </div>
+                            <div class="panel-body">
+
+                                <div class="row">
+                                    <button type="button" class="btn btn-teal btn-lg" data-toggle="modal" data-target="#addDeviceModal">
+                                            Add Device
+                                    </button>
+                                </div>
+                                    <br>
+                                    <br>
+                                        
+                                    <!--Add Device Modal-->
+                                    <div id="addDeviceModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                    
+                                                <!-- Modal Header -->
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                    <h4 class="modal-title" id="myModalLabel">Add Device</h4>
+                                                </div>
+                                                <br>
+                                    
+                                                <div class="modal-body">
+                                                        <p>Enter full data to add a new simulated device and click create devices.</p>
+                                                        <form class="nomargin sky-form" enctype="multipart/form-data">
+                                                            <fieldset>
+                            
+                                                                <div class="row">
+                                                                    <div class="form-group">
+                            
+                                                                        <div class="col-md-6 col-sm-6">
+                                                                            <label>Friendly Name</label>
+                                                                            <label class="input margin-bottom-10">
+                                                                                <i class="ico-append fa concierge-bell"></i>
+                                                                                <input data-bind="value: staged_add_device.name" required="" type="text">
+                                                                            </label>
+                                                                        </div>
+                            
+                                                                        <div class="col-md-6 col-sm-6">
+                                                                            <label>Target Simulation Cluster</label>
+                                                                            <label class="input margin-bottom-10">
+                                                                                <i class="ico-append fa server"></i>
+                                                                                <input data-bind="value: staged_add_device.sim_region" type="text" class="form-control datepicker" data-format="yyyy-mm-dd" data-lang="en" data-RTL="false">
+                                                                            </label>
+                                                                        </div>
+                            
+                                                                    </div>
+                                                                </div>
+                            
+                                                                <div class="row">
+                                                                    <div class="form-group">
+                            
+                                                                        <div class="col-md-6 col-sm-6">
+                                                                            <label># Devices</label>
+                                                                            <label class="input margin-bottom-10">
+                                                                                <i class="ico-append fa fa-hashtag"></i>
+                                                                                <input data-bind="value: staged_add_device.number_devices" required="" type="number">
+                                                                            </label>
+                                                                        </div>
+                            
+                                                                    </div>
+                                                                </div>
+                                                            </fieldset>
+                                                        </form>
+                                                    </div>
+                                    
+                                                <!-- Modal Footer -->
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                    <button data-bind="click: create_leaf_devices" type="button" class="btn btn-primary">Create Devices</button>
+                                                </div>
+                                    
+                                            </div>
+                                        </div>
+                                    </div>
+                                        
+                                    <!--/Add Device Modal-->
+
+                                    <!--Devices Data Table-->
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Device Id</th>
+                                                    <th>Device Name</th>
+                                                    <th>Cluster</th>
+                                                    <th>Device Alive</th>
+                                                    <th>Delete</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody data-bind="foreach: devices">
+                                                <tr class="success">
+                                                    <td><a data-bind="attr: { href: link }, text: device_id" style="color: cornflowerblue">loading...</a></td>
+                                                    <td data-bind="text: device_name"></td>
+                                                    <td data-bind="text: cluster_name"></td>                                                        
+                                                    <td data-bind="visible: is_alive"><span class="label label-success">Alive</span></td>
+                                                    <!-- <td data-bind="visible: is_dead"><span class="label label-danger">Dead</span></td> -->
+                                                    <td>
+                                                        <button role="button" aria-label="delete simulated device." type="button" data-bind="click: $parent.activate_delete_device_modal" class="btn btn-default btn-xs">delete</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!--/Devices Data Table-->
+                                    
+                                    <div id="delete_device_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+
+                                                <!-- Modal Header -->
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                    <h4 class="modal-title" id="myModalLabel">Really Delete Device?</h4>
+                                                </div>
+
+                                                <!-- Modal Body -->
+                                                <div class="modal-body">
+                                                    <p>This will permanently delete the simulated device from the simulation cluster.</p>
+                                                </div>
+
+                                                <!-- Modal Footer -->
+                                                <div class="modal-footer">
+                                                    <button data-bind="click: delete_device" type="button" class="btn btn-primary">Delete Device</button>
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /Devices TAB -->
+
+                <!-- simregion TAB -->
+                <div class="tab-pane fade" id="simregion">
+
+                    <div class="row">
+                        <div class="panel panel-success">
+                            <div class="panel-heading">
+                                    <h2 class="panel-title"><strong>Simulation Region</strong></text></h2>
+                                    <p>Management of simulation regions not yet supported in sim manager.</p>
+                            </div>
+                            <div class="panel-body">
+
+                                <div class="row">
+                                    <button type="button" class="btn btn-teal btn-lg" data-toggle="modal" data-target="#addSimRegionModal">
+                                            Add Simulation Region
+                                    </button>
+                                </div>
+                                    <br>
+                                    <br>
+
+                                    <!--Devices Data Table-->
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Device Id</th>
+                                                    <th>Device Name</th>
+                                                    <th>Cluster</th>
+                                                    <th>Device Alive</th>
+                                                    <th>Delete</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody data-bind="foreach: devices">
+                                                <tr class="success">
+                                                    <td><a data-bind="attr: { href: link }, text: device_id" style="color: cornflowerblue">loading...</a></td>
+                                                    <td data-bind="text: device_name"></td>
+                                                    <td data-bind="text: cluster_name"></td>                                                        
+                                                    <!-- <td data-bind="visible: is_alive"><span class="label label-success">Alive</span></td> -->
+                                                    <td data-bind="visible: is_dead"><span class="label label-danger">Dead</span></td>
+                                                    <td>
+                                                        <button type="button"  data-bind="click: $parent.activate_delete_device_modal" class="btn btn-default btn-xs">delete</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!--/Devices Data Table-->
+                                    
+                                    <div id="delete_device_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+
+                                                <!-- Modal Header -->
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                    <h4 class="modal-title" id="myModalLabel">Really Delete Device?</h4>
+                                                </div>
+
+                                                <!-- Modal Body -->
+                                                <div class="modal-body">
+                                                    <p>This will permanently delete the simulated device from the simulation cluster.</p>
+                                                </div>
+
+                                                <!-- Modal Footer -->
+                                                <div class="modal-footer">
+                                                    <button data-bind="click: delete_device" type="button" class="btn btn-primary">Delete Device</button>
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /simregion TAB -->
+
+                <!-- IoT Hubs TAB -->
+                <div class="tab-pane fade" id="iothubs">
+
+                    <div class="row">
+                        <div class="panel panel-success">
+                            <div class="panel-heading">
+                                    <h2 class="panel-title"><strong>IoT Hubs</strong></text></h2>
+                                    <p>Management of iot hubs not yet supported in sim manager.</p>
+                            </div>
+                            <div class="panel-body">
+
+                                <div class="row">
+                                    <button type="button" class="btn btn-teal btn-lg" data-toggle="modal" data-target="#addIoTHubModal">
+                                            Add IoT Hub
+                                    </button>
+                                </div>
+                                    <br>
+                                    <br>
+
+                                    <!--Devices Data Table-->
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Device Id</th>
+                                                    <th>Device Name</th>
+                                                    <th>Cluster</th>
+                                                    <th>Device Alive</th>
+                                                    <th>Delete</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody data-bind="foreach: devices">
+                                                <tr class="success">
+                                                    <td><a data-bind="attr: { href: link }, text: device_id" style="color: cornflowerblue">loading...</a></td>
+                                                    <td data-bind="text: device_name"></td>
+                                                    <td data-bind="text: cluster_name"></td>                                                        
+                                                    <td data-bind="visible: is_alive"><span class="label label-success">Alive</span></td>
+                                                    <!-- <td data-bind="visible: is_dead"><span class="label label-danger">Dead</span></td> -->
+                                                    <td>
+                                                        <button type="button"  data-bind="click: $parent.activate_delete_device_modal" class="btn btn-default btn-xs">delete</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!--/Devices Data Table-->
+                                    
+                                    <div id="delete_device_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+
+                                                <!-- Modal Header -->
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                    <h4 class="modal-title" id="myModalLabel">Really Delete Device?</h4>
+                                                </div>
+
+                                                <!-- Modal Body -->
+                                                <div class="modal-body">
+                                                    <p>This will permanently delete the simulated device from the simulation cluster.</p>
+                                                    <p>device id: </p><p data-bind="text: staged_delete_device.device_id"></p>
+                                                </div>
+
+                                                <!-- Modal Footer -->
+                                                <div class="modal-footer">
+                                                    <button data-bind="click: delete_device" type="button" class="btn btn-primary">Delete Device</button>
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /IoT Hubs TAB -->
+
+            </div>
+
+        </div>        
+    </div>
+
+
+
+{% endblock %}
