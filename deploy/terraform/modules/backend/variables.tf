@@ -32,20 +32,6 @@ variable "tags" {
   default     = {}
 }
 
-#storage account
-
-variable "account_replication_type" {
-  description = "(Required) Defines the type of replication to use for this storage account. Valid options are LRS, GRS, RAGRS and ZRS."
-  type        = string
-  default     = "LRS"
-}
-
-variable "account_tier" {
-  description = "(Required) Defines the Tier to use for this storage account. Valid options are Standard and Premium. For FileStorage accounts only Premium is valid. Changing this forces a new resource to be created."
-  type        = string
-  default     = "Standard"
-}
-
 #sql server
 
 variable "sql_version" {

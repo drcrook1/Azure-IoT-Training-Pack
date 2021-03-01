@@ -7,6 +7,7 @@ No requirements.
 | Name | Version |
 |------|---------|
 | azurerm | n/a |
+| random | n/a |
 
 ## Modules
 
@@ -16,11 +17,14 @@ No Modules.
 
 | Name |
 |------|
+| [azurerm_container_registry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry) |
 | [azurerm_kubernetes_cluster](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster) |
 | [azurerm_kubernetes_cluster_node_pool](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster_node_pool) |
 | [azurerm_resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) |
+| [azurerm_role_assignment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) |
 | [azurerm_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) |
 | [azurerm_virtual_network](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) |
+| [random_string](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) |
 
 ## Inputs
 
