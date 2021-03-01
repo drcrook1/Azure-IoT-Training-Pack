@@ -17,6 +17,8 @@ resource "azurerm_virtual_network" "base" {
 
 }
 
+#subnet
+
 resource "azurerm_subnet" "base" {
   name                 = "snet-aks-${var.environment}-${var.region}"
   resource_group_name  = azurerm_resource_group.base.name
@@ -68,4 +70,29 @@ resource "azurerm_kubernetes_cluster_node_pool" "base" {
   mode                  = "User"
   vnet_subnet_id        = azurerm_subnet.base.id
   tags                  = var.tags
+}
+
+#random string
+
+resource "random_string" "base" {
+  length      = 4
+  special     = false
+  min_numeric = 4
+}
+
+#container registry
+
+resource "azurerm_container_registry" "base" {
+  name                = lower("${var.name_prefix}${substr(var.environment, 0, 2)}${random_string.base.result}${var.region}")
+  resource_group_name = azurerm_resource_group.base.name
+  location            = azurerm_resource_group.base.location
+  sku                 = "Standard"
+  admin_enabled       = true
+}
+
+resource "azurerm_role_assignment" "base" {
+  scope                            = azurerm_container_registry.base.id
+  role_definition_name             = "AcrPull"
+  principal_id                     = azurerm_kubernetes_cluster.base.identity[0].principal_id
+  skip_service_principal_aad_check = true
 }
