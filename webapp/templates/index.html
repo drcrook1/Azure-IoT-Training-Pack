@@ -3,8 +3,7 @@
 {% block pagescripts %}
     <script type="text/javascript" src="{{ url_for('static', filename='js/index.js') }}" ></script>
     <script type="text/javascript">
-        var create_device_endpoint =  "{{ url_for('simulate.create_leaf_device') }}";
-        var delete_device_endpoint =  "{{ url_for('simulate.delete_leaf_device') }}";
+        var configure_sim_region_endpoint =  "{{ url_for('simulate.configure_sim_region') }}";
     </script>
 {% endblock %}
 
@@ -24,7 +23,6 @@
 
             <ul class="nav nav-tabs nav-top-border">
                 <li class="active"><a href="#devices" data-toggle="tab" aria-expanded="true">Devices</a></li>
-                <li class=""><a href="#simregion" data-toggle="tab" aria-expanded="false">Sim Region</a></li>
                 <li class=""><a href="#iothubs" data-toggle="tab" aria-expanded="false">IoT Hubs</a></li>
             </ul>
 
@@ -35,104 +33,29 @@
                     <div class="row">
                         <div class="panel panel-success">
                             <div class="panel-heading">
-                                    <h2 class="panel-title"><strong>Devices</strong>: <text data-bind="text: num_leaf_devices"></text></h2>
+                                    <h2 class="panel-title"><strong>Total Devices</strong>: <text data-bind="text: num_devices"></text></h2>
                             </div>
                             <div class="panel-body">
-
-                                <div class="row">
-                                    <button type="button" class="btn btn-teal btn-lg" data-toggle="modal" data-target="#addDeviceModal">
-                                            Add Device
-                                    </button>
-                                </div>
                                     <br>
-                                    <br>
-                                        
-                                    <!--Add Device Modal-->
-                                    <div id="addDeviceModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                    
-                                                <!-- Modal Header -->
-                                                <div class="modal-header">
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                    <h4 class="modal-title" id="myModalLabel">Add Device</h4>
-                                                </div>
-                                                <br>
-                                    
-                                                <div class="modal-body">
-                                                        <p>Enter full data to add a new simulated device and click create devices.</p>
-                                                        <form class="nomargin sky-form" enctype="multipart/form-data">
-                                                            <fieldset>
-                            
-                                                                <div class="row">
-                                                                    <div class="form-group">
-                            
-                                                                        <div class="col-md-6 col-sm-6">
-                                                                            <label>Friendly Name</label>
-                                                                            <label class="input margin-bottom-10">
-                                                                                <i class="ico-append fa concierge-bell"></i>
-                                                                                <input data-bind="value: staged_add_device.name" required="" type="text">
-                                                                            </label>
-                                                                        </div>
-                            
-                                                                        <div class="col-md-6 col-sm-6">
-                                                                            <label>Target Simulation Cluster</label>
-                                                                            <label class="input margin-bottom-10">
-                                                                                <i class="ico-append fa server"></i>
-                                                                                <input data-bind="value: staged_add_device.sim_region" type="text" class="form-control datepicker" data-format="yyyy-mm-dd" data-lang="en" data-RTL="false">
-                                                                            </label>
-                                                                        </div>
-                            
-                                                                    </div>
-                                                                </div>
-                            
-                                                                <div class="row">
-                                                                    <div class="form-group">
-                            
-                                                                        <div class="col-md-6 col-sm-6">
-                                                                            <label># Devices</label>
-                                                                            <label class="input margin-bottom-10">
-                                                                                <i class="ico-append fa fa-hashtag"></i>
-                                                                                <input data-bind="value: staged_add_device.number_devices" required="" type="number">
-                                                                            </label>
-                                                                        </div>
-                            
-                                                                    </div>
-                                                                </div>
-                                                            </fieldset>
-                                                        </form>
-                                                    </div>
-                                    
-                                                <!-- Modal Footer -->
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                    <button data-bind="click: create_leaf_devices" type="button" class="btn btn-primary">Create Devices</button>
-                                                </div>
-                                    
-                                            </div>
-                                        </div>
-                                    </div>
-                                        
-                                    <!--/Add Device Modal-->
 
                                     <!--Devices Data Table-->
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
                                             <thead>
                                                 <tr>
-                                                    <th>Device Id</th>
-                                                    <th>Device Name</th>
-                                                    <th>Cluster</th>
-                                                    <th>Delete</th>
+                                                    <th>Name</th>
+                                                    <th>Region</th>
+                                                    <th># Devices</th>
+                                                    <th>Configure</th>
                                                 </tr>
                                             </thead>
-                                            <tbody data-bind="foreach: devices">
+                                            <tbody data-bind="foreach: simulated_regions">
                                                 <tr class="success">
-                                                    <td><a data-bind="text: device_id">loading...</a></td>
-                                                    <td data-bind="text: name"></td>
-                                                    <td data-bind="text: sim_region"></td>
+                                                    <td data-bind="text: name">loading...</td>
+                                                    <td data-bind="text: region">loading...</td>
+                                                    <td data-bind="text: num_devices">loading...</td>
                                                     <td>
-                                                        <button role="button" aria-label="delete simulated device." type="button" data-bind="click: $parent.activate_delete_device_modal" class="btn btn-default btn-xs">delete</button>
+                                                        <button role="button" aria-label="configure sim region" type="button" data-bind="click: $parent.activate_configure_sim_region_modal" class="btn btn-default btn-xs">configure</button>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -140,7 +63,7 @@
                                     </div>
                                     <!--/Devices Data Table-->
                                     
-                                    <div id="delete_device_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                    <div id="configure_sim_region_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
 
@@ -152,13 +75,52 @@
 
                                                 <!-- Modal Body -->
                                                 <div class="modal-body">
-                                                    <p>This will permanently delete the simulated device from the simulation cluster.</p>
-                                                    <p data-bind="text: staged_delete_device.device_id"></p>
+                                                    <p>Configure Selected Simulation Region.</p>
+                                                    <form class="nomargin sky-form" enctype="multipart/form-data">
+                                                        <fieldset>
+                        
+                                                            <div class="row">
+                                                                <div class="form-group">
+                        
+                                                                    <div class="col-md-6 col-sm-6">
+                                                                        <label>Friendly Name</label>
+                                                                        <label class="input margin-bottom-10">
+                                                                            <i class="ico-append fa concierge-bell"></i>
+                                                                            <input data-bind="value: staged_sim_configure.name" required="" type="text">
+                                                                        </label>
+                                                                    </div>
+                        
+                                                                    <div class="col-md-6 col-sm-6">
+                                                                        <label>Simulation Region</label>
+                                                                        <label class="input margin-bottom-10">
+                                                                            <i class="ico-append fa server"></i>
+                                                                            <input data-bind="value: staged_sim_configure.region" type="text" class="form-control datepicker" data-format="yyyy-mm-dd" data-lang="en" data-RTL="false">
+                                                                        </label>
+                                                                    </div>
+                        
+                                                                </div>
+                                                            </div>
+                        
+                                                            <div class="row">
+                                                                <div class="form-group">
+                        
+                                                                    <div class="col-md-6 col-sm-6">
+                                                                        <label># Devices</label>
+                                                                        <label class="input margin-bottom-10">
+                                                                            <i class="ico-append fa fa-hashtag"></i>
+                                                                            <input data-bind="value: staged_sim_configure.num_devices" required="" type="number">
+                                                                        </label>
+                                                                    </div>
+                        
+                                                                </div>
+                                                            </div>
+                                                        </fieldset>
+                                                    </form>
                                                 </div>
 
                                                 <!-- Modal Footer -->
                                                 <div class="modal-footer">
-                                                    <button data-bind="click: delete_device" type="button" class="btn btn-primary">Delete Device</button>
+                                                    <button data-bind="click: configure_sim_region" type="button" class="btn btn-primary">Configure</button>
                                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                                 </div>
 
@@ -171,31 +133,6 @@
 
                 </div>
                 <!-- /Devices TAB -->
-
-                <!-- simregion TAB -->
-                <div class="tab-pane fade" id="simregion">
-
-                    <div class="row">
-                        <div class="panel panel-success">
-                            <div class="panel-heading">
-                                    <h2 class="panel-title"><strong>Simulation Region</strong></text></h2>
-                                    <p>Management of simulation regions not yet supported in sim manager.</p>
-                            </div>
-                            <div class="panel-body">
-
-                                <div class="row">
-                                    <button type="button" class="btn btn-teal btn-lg" data-toggle="modal" data-target="#addSimRegionModal">
-                                            Add Simulation Region
-                                    </button>
-                                </div>
-                                    <br>
-                                    <br>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <!-- /simregion TAB -->
 
                 <!-- IoT Hubs TAB -->
                 <div class="tab-pane fade" id="iothubs">

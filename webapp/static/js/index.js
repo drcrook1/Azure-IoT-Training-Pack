@@ -3,90 +3,58 @@ var baseUrl = getUrl .protocol + "//" + getUrl.host;
 
 
 
-function activate_delete_device_modal(ko_object){
-    $("#delete_device_modal").modal("show");
-    sim_vm.staged_delete_device.device_id(ko_object.device_id());
+function activate_configure_sim_region_modal(ko_object){
+    $("#configure_sim_region_modal").modal("show");
+    sim_vm.staged_sim_configure.region(ko_object.region());
 }
 
-function create_leaf_devices(device_vm){
-    var json_data = ko.toJSON(device_vm);
+function configure_sim_region(ko_object){
+    var json_data = ko.toJSON(ko_object);
     $.ajax(
         {
-            url: create_device_endpoint,
+            url: configure_sim_region_endpoint,
             type: "POST",
             data: json_data,
             contentType: "application/json",
             success: function(data) {
                 data = JSON.parse(data);
                 toastr.success(data.method_called,"Success");
+                $("#configure_sim_region_modal").modal("hide");
             }
         }
     );
-}
-
-function delete_device(device_vm){
-    var json_data = ko.toJSON(device_vm);
-    $.ajax(
-        {
-            url: delete_device_endpoint,
-            type: "POST",
-            data: json_data,
-            contentType: "application/json",
-            success: function(data) {
-                data = JSON.parse(data);
-                toastr.success(data.method_called,"Success");
-            }
-        }
-    );
-}
-
-function iothub_vm(){
-    var self = this;
-    self.region = ko.observable("eastus");
 }
 
 function sim_region_vm(){
     var self = this;
     self.region = ko.observable("eastus");
+    self.name = ko.observable("name");
+    self.num_devices = ko.observable(0);
 }
 
-function leaf_devices_vm(){
-    var self = this;
-    self.device_id = ko.observable("liadf9");
-    self.number_devices = ko.observable(1);
-    self.sim_region = ko.observable("eastus");
-    self.name = ko.observable("friendly name");
-}
-
-function hydrate_devices(){
-    sim_vm.devices.removeAll();
-    new_device = new leaf_devices_vm();
-    sim_vm.devices.push(new_device);
-    new_device_2 = new leaf_devices_vm();
-    new_device_2.device_id("123456");
-    sim_vm.devices.push(new_device_2);
+function hydrate_sim_regions(){
+    sim_vm.simulated_regions.removeAll();
+    new_region = new sim_region_vm();
+    new_region.name("default");
+    sim_vm.simulated_regions.push(new_region);
+    sim_vm.num_devices(new_region.num_devices());
 }
 
 function sim_manager_vm(){
     var self = this;
-    self.staged_delete_device = new leaf_devices_vm();
-    self.staged_delete_simregion = new sim_region_vm();
-    self.staged_delete_iothub = new iothub_vm();
 
-    self.staged_add_device = new leaf_devices_vm();
-    self.staged_add_simregion = new sim_region_vm();
-    self.staged_add_iothub = new iothub_vm();
+    self.add_sim_region = new sim_region_vm();
+    self.staged_sim_configure = new sim_region_vm();
 
-    self.devices = ko.observableArray();
+    self.simulated_regions = ko.observableArray();
 
-    self.num_leaf_devices = ko.observable("loading...");
+    self.num_devices = ko.observable("loading...");
 
-    self.create_leaf_devices = function() { create_leaf_devices(self.staged_add_device); };
-    self.delete_device = function() { delete_device(self.staged_delete_device); };
-    self.activate_delete_device_modal = function() { activate_delete_device_modal(this); };
+    self.configure_sim_region = function() { configure_sim_region(self.staged_sim_configure); };
+    self.activate_configure_sim_region_modal = function() { activate_configure_sim_region_modal(this); };
 }
 
 var sim_vm = new sim_manager_vm();
 
 ko.applyBindings(sim_vm, document.getElementById("page_content"));
-hydrate_devices();
+hydrate_sim_regions();

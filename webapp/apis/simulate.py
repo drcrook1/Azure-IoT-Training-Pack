@@ -3,8 +3,8 @@ import simplejson
 
 simulate = Blueprint('simulate', __name__, url_prefix='/api/simulate')
 
-@simulate.route('/leafdevice/create', methods=['POST'])
-def create_leaf_device():
+@simulate.route('/simregion/configure', methods=['POST'])
+def configure_sim_region():
     '''
     simulateas a leaf device
     '''
@@ -13,18 +13,6 @@ def create_leaf_device():
     # read configs
     # Deploy leafdevice .yaml to aks
     # Write deployment information to sql
-    r_json["method_called"] = "leafdevice/create"
+    # helm deploy
+    r_json["method_called"] = "/simregion/configure"
     return simplejson.dumps(r_json, ignore_nan=True)
-
-@simulate.route('/leafdevice/delete', methods=['POST'])
-def delete_leaf_device():
-    '''
-    simulateas a leaf device
-    '''
-    r_json = request.get_json()
-    print(r_json)
-    # read configs
-    # Deploy leafdevice .yaml to aks
-    # Write deployment information to sql
-    r_json["method_called"] = "leafdevice/delete"
-    return simplejson.dumps(r_json, ignore_nan=True)    
