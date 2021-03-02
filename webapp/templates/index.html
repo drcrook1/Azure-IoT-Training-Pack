@@ -3,7 +3,8 @@
 {% block pagescripts %}
     <script type="text/javascript" src="{{ url_for('static', filename='js/index.js') }}" ></script>
     <script type="text/javascript">
-        var add_device_endpoint =  "{{ url_for('simulate.create_leaf_device') }}";
+        var create_device_endpoint =  "{{ url_for('simulate.create_leaf_device') }}";
+        var delete_device_endpoint =  "{{ url_for('simulate.delete_leaf_device') }}";
     </script>
 {% endblock %}
 
@@ -122,17 +123,14 @@
                                                     <th>Device Id</th>
                                                     <th>Device Name</th>
                                                     <th>Cluster</th>
-                                                    <th>Device Alive</th>
                                                     <th>Delete</th>
                                                 </tr>
                                             </thead>
                                             <tbody data-bind="foreach: devices">
                                                 <tr class="success">
-                                                    <td><a data-bind="attr: { href: link }, text: device_id" style="color: cornflowerblue">loading...</a></td>
-                                                    <td data-bind="text: device_name"></td>
-                                                    <td data-bind="text: cluster_name"></td>                                                        
-                                                    <td data-bind="visible: is_alive"><span class="label label-success">Alive</span></td>
-                                                    <!-- <td data-bind="visible: is_dead"><span class="label label-danger">Dead</span></td> -->
+                                                    <td><a data-bind="text: device_id">loading...</a></td>
+                                                    <td data-bind="text: name"></td>
+                                                    <td data-bind="text: sim_region"></td>
                                                     <td>
                                                         <button role="button" aria-label="delete simulated device." type="button" data-bind="click: $parent.activate_delete_device_modal" class="btn btn-default btn-xs">delete</button>
                                                     </td>
@@ -155,6 +153,7 @@
                                                 <!-- Modal Body -->
                                                 <div class="modal-body">
                                                     <p>This will permanently delete the simulated device from the simulation cluster.</p>
+                                                    <p data-bind="text: staged_delete_device.device_id"></p>
                                                 </div>
 
                                                 <!-- Modal Footer -->
@@ -191,59 +190,6 @@
                                 </div>
                                     <br>
                                     <br>
-
-                                    <!--Devices Data Table-->
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Device Id</th>
-                                                    <th>Device Name</th>
-                                                    <th>Cluster</th>
-                                                    <th>Device Alive</th>
-                                                    <th>Delete</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody data-bind="foreach: devices">
-                                                <tr class="success">
-                                                    <td><a data-bind="attr: { href: link }, text: device_id" style="color: cornflowerblue">loading...</a></td>
-                                                    <td data-bind="text: device_name"></td>
-                                                    <td data-bind="text: cluster_name"></td>                                                        
-                                                    <!-- <td data-bind="visible: is_alive"><span class="label label-success">Alive</span></td> -->
-                                                    <td data-bind="visible: is_dead"><span class="label label-danger">Dead</span></td>
-                                                    <td>
-                                                        <button type="button"  data-bind="click: $parent.activate_delete_device_modal" class="btn btn-default btn-xs">delete</button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <!--/Devices Data Table-->
-                                    
-                                    <div id="delete_device_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-
-                                                <!-- Modal Header -->
-                                                <div class="modal-header">
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                    <h4 class="modal-title" id="myModalLabel">Really Delete Device?</h4>
-                                                </div>
-
-                                                <!-- Modal Body -->
-                                                <div class="modal-body">
-                                                    <p>This will permanently delete the simulated device from the simulation cluster.</p>
-                                                </div>
-
-                                                <!-- Modal Footer -->
-                                                <div class="modal-footer">
-                                                    <button data-bind="click: delete_device" type="button" class="btn btn-primary">Delete Device</button>
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
                             </div>
                         </div>
                     </div>
@@ -269,60 +215,6 @@
                                 </div>
                                     <br>
                                     <br>
-
-                                    <!--Devices Data Table-->
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Device Id</th>
-                                                    <th>Device Name</th>
-                                                    <th>Cluster</th>
-                                                    <th>Device Alive</th>
-                                                    <th>Delete</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody data-bind="foreach: devices">
-                                                <tr class="success">
-                                                    <td><a data-bind="attr: { href: link }, text: device_id" style="color: cornflowerblue">loading...</a></td>
-                                                    <td data-bind="text: device_name"></td>
-                                                    <td data-bind="text: cluster_name"></td>                                                        
-                                                    <td data-bind="visible: is_alive"><span class="label label-success">Alive</span></td>
-                                                    <!-- <td data-bind="visible: is_dead"><span class="label label-danger">Dead</span></td> -->
-                                                    <td>
-                                                        <button type="button"  data-bind="click: $parent.activate_delete_device_modal" class="btn btn-default btn-xs">delete</button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <!--/Devices Data Table-->
-                                    
-                                    <div id="delete_device_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-
-                                                <!-- Modal Header -->
-                                                <div class="modal-header">
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                    <h4 class="modal-title" id="myModalLabel">Really Delete Device?</h4>
-                                                </div>
-
-                                                <!-- Modal Body -->
-                                                <div class="modal-body">
-                                                    <p>This will permanently delete the simulated device from the simulation cluster.</p>
-                                                    <p>device id: </p><p data-bind="text: staged_delete_device.device_id"></p>
-                                                </div>
-
-                                                <!-- Modal Footer -->
-                                                <div class="modal-footer">
-                                                    <button data-bind="click: delete_device" type="button" class="btn btn-primary">Delete Device</button>
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
                             </div>
                         </div>
                     </div>
