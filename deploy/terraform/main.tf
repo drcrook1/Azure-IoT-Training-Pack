@@ -2,34 +2,65 @@
 # environment composition
 ###
 
-module "key_vault" {
-  source      = "./modules/key_vault"
-  environment = var.environment
-  region      = var.region
-  tags        = var.tags
+resource "azurerm_resource_group" "base" {
+  name     = "rg-ftaiot-${var.environment}-${var.region}"
+  location = var.region
 }
 
-module "backend" {
-  source                       = "./modules/backend"
+resource "random_string" "base" {
+  length      = 5
+  min_numeric = 5
+  special     = false
+}
+
+module "azure_key_vault" {
+  source               = "./modules/azure_key_vault"
+  environment          = var.environment
+  region               = var.region
+  resource_group_name  = azurerm_resource_group.base.name
+  random_string_result = random_string.base.result
+  tags                 = var.tags
+}
+
+module "azure_sql" {
+  source                       = "./modules/azure_sql"
   environment                  = var.environment
   region                       = var.region
+  resource_group_name          = azurerm_resource_group.base.name
+  random_string_result         = random_string.base.result
   tags                         = var.tags
   administrator_login          = var.administrator_login
-  administrator_login_password = module.key_vault.sql_password
+  administrator_login_password = module.azure_key_vault.sql_password
 }
 
-module "iot" {
-  source      = "./modules/iot"
-  environment = var.environment
-  region      = var.region
-  tags        = var.tags
+module "azure_iot_hub" {
+  source               = "./modules/azure_iot_hub"
+  environment          = var.environment
+  region               = var.region
+  resource_group_name  = azurerm_resource_group.base.name
+  random_string_result = random_string.base.result
+  tags                 = var.tags
 }
 
-module "kubernetes" {
-  source           = "./modules/kubernetes"
-  environment      = var.environment
-  region           = var.region
-  tags             = var.tags
-  address_space    = var.address_space
-  address_prefixes = var.address_prefixes
+module "azure_data_explorer" {
+  source                           = "./modules/azure_data_explorer"
+  environment                      = var.environment
+  region                           = var.region
+  resource_group_name              = azurerm_resource_group.base.name
+  random_string_result             = random_string.base.result
+  tags                             = var.tags
+  iothub_id                        = module.azure_iot_hub.iothub_id
+  iothub_consumer_group            = module.azure_iot_hub.iothub_consumer_group
+  iothub_shared_access_policy_name = module.azure_iot_hub.iothub_shared_access_policy_name
+}
+
+module "azure_kubernetes_service" {
+  source               = "./modules/azure_kubernetes_service"
+  environment          = var.environment
+  region               = var.region
+  resource_group_name  = azurerm_resource_group.base.name
+  random_string_result = random_string.base.result
+  tags                 = var.tags
+  address_space        = var.address_space
+  address_prefixes     = var.address_prefixes
 }

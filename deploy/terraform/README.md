@@ -3,26 +3,33 @@
 | Name | Version |
 |------|---------|
 | terraform | >= 0.14 |
-| azurerm | >=2.46.0 |
+| azurerm | >=2.49.0 |
 | helm | >=2.0.0 |
 | kubernetes | >=2.0.0 |
 
 ## Providers
 
-No provider.
+| Name | Version |
+|------|---------|
+| azurerm | >=2.49.0 |
+| random | n/a |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| backend | ./modules/backend |  |
-| iot | ./modules/iot |  |
-| key_vault | ./modules/key_vault |  |
-| kubernetes | ./modules/kubernetes |  |
+| azure_data_explorer | ./modules/azure_data_explorer |  |
+| azure_iot_hub | ./modules/azure_iot_hub |  |
+| azure_key_vault | ./modules/azure_key_vault |  |
+| azure_kubernetes_service | ./modules/azure_kubernetes_service |  |
+| azure_sql | ./modules/azure_sql |  |
 
 ## Resources
 
-No resources.
+| Name |
+|------|
+| [azurerm_resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) |
+| [random_string](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) |
 
 ## Inputs
 

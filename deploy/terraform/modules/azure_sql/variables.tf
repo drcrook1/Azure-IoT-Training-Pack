@@ -13,7 +13,7 @@ variable "service_name" {
 variable "name_prefix" {
   description = "A short pre-defined text to identify the resource type"
   type        = string
-  default     = "ftaiot"
+  default     = "sql"
 }
 
 variable "environment" {
@@ -23,6 +23,16 @@ variable "environment" {
 
 variable "region" {
   description = "Geographic Region resource will be deployed into"
+  type        = string
+}
+
+variable "resource_group_name" {
+  description = "(Required) The Name of this Resource Group."
+  type        = string
+}
+
+variable "random_string_result" {
+  description = "The generated random string."
   type        = string
 }
 
