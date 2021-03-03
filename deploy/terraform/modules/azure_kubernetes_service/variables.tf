@@ -22,6 +22,16 @@ variable "region" {
   type        = string
 }
 
+variable "resource_group_name" {
+  description = "(Required) The Name of this Resource Group."
+  type        = string
+}
+
+variable "random_string_result" {
+  description = "The generated random string."
+  type        = string
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(any)

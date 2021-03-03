@@ -1,18 +1,10 @@
-#resource group
-
-resource "azurerm_resource_group" "base" {
-  name     = "rg-${var.service_name}-${var.environment}-${var.region}"
-  location = var.region
-  tags     = var.tags
-}
-
 # virtual network
 
 resource "azurerm_virtual_network" "base" {
   name                = "vnet-${var.name_prefix}-${var.environment}-${var.region}"
-  resource_group_name = azurerm_resource_group.base.name
+  resource_group_name = var.resource_group_name
   address_space       = var.address_space
-  location            = azurerm_resource_group.base.location
+  location            = var.region
   tags                = var.tags
 
 }
@@ -20,8 +12,8 @@ resource "azurerm_virtual_network" "base" {
 #subnet
 
 resource "azurerm_subnet" "base" {
-  name                 = "snet-aks-${var.environment}-${var.region}"
-  resource_group_name  = azurerm_resource_group.base.name
+  name                 = "snet-${var.name_prefix}-${var.environment}-${var.region}"
+  resource_group_name  = var.resource_group_name
   address_prefixes     = var.address_prefixes
   virtual_network_name = azurerm_virtual_network.base.name
 }
@@ -30,9 +22,9 @@ resource "azurerm_subnet" "base" {
 
 resource "azurerm_kubernetes_cluster" "base" {
   name                = "${var.name_prefix}-${var.environment}-${var.region}"
-  location            = azurerm_resource_group.base.location
-  resource_group_name = azurerm_resource_group.base.name
-  node_resource_group = "${azurerm_resource_group.base.name}-nodes"
+  location            = var.region
+  resource_group_name = var.resource_group_name
+  node_resource_group = "${var.resource_group_name}-nodes"
   kubernetes_version  = var.kubernetes_version
   dns_prefix          = "${var.name_prefix}-${var.environment}-${var.region}-dns"
 
@@ -42,9 +34,10 @@ resource "azurerm_kubernetes_cluster" "base" {
     vm_size                      = var.vm_size
     availability_zones           = [1, 2, 3]
     enable_auto_scaling          = true
+    max_pods                     = 250
     max_count                    = 3
     min_count                    = 1
-    node_count                   = 2
+    node_count                   = 1
     vnet_subnet_id               = azurerm_subnet.base.id
     tags                         = var.tags
   }
@@ -65,6 +58,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "base" {
   availability_zones    = [1, 2, 3]
   enable_auto_scaling   = true
   max_count             = 10
+  max_pods              = 250
   min_count             = 1
   node_count            = 1
   mode                  = "User"
@@ -72,20 +66,12 @@ resource "azurerm_kubernetes_cluster_node_pool" "base" {
   tags                  = var.tags
 }
 
-#random string
-
-resource "random_string" "base" {
-  length      = 4
-  special     = false
-  min_numeric = 4
-}
-
 #container registry
 
 resource "azurerm_container_registry" "base" {
-  name                = lower("${var.name_prefix}${substr(var.environment, 0, 2)}${random_string.base.result}${var.region}")
-  resource_group_name = azurerm_resource_group.base.name
-  location            = azurerm_resource_group.base.location
+  name                = lower("cr${var.name_prefix}${var.environment}${var.region}${var.random_string_result}")
+  resource_group_name = var.resource_group_name
+  location            = var.region
   sku                 = "Standard"
   admin_enabled       = true
 }
