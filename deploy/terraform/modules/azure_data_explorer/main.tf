@@ -26,5 +26,6 @@ resource "azurerm_kusto_iothub_data_connection" "base" {
   iothub_id                 = var.iothub_id
   consumer_group            = var.iothub_consumer_group
   shared_access_policy_name = var.iothub_shared_access_policy_name
+  event_system_properties   = ["message-id", "sequence-number", "to", "correlation-id", "iothub-connection-device-id"]
 }
 
