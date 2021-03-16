@@ -82,3 +82,23 @@ resource "azurerm_role_assignment" "base" {
   principal_id                     = azurerm_kubernetes_cluster.base.identity[0].principal_id
   skip_service_principal_aad_check = true
 }
+
+# HELM INSTALL
+provider "helm" {
+  kubernetes {
+    host     = azurerm_kubernetes_cluster.base.kube_config.0.host
+
+    client_certificate     = azurerm_kubernetes_cluster.base.kube_config.0.client_certificate
+    client_key             = azurerm_kubernetes_cluster.base.kube_config.0.client_key
+    cluster_ca_certificate = azurerm_kubernetes_cluster.base.kube_config.0.cluster_ca_certificate
+  }
+}
+
+# CSI DRIVER
+resource "helm_release" "csidriver" {
+  name       = "csi-secrets-store-provider-azure"
+
+  repository = "https://raw.githubusercontent.com/Azure/secrets-store-csi-driver-provider-azure/master/charts"
+  chart      = "csi-secrets-store-provider-azure/csi-secrets-store-provider-azure"
+
+}
