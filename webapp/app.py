@@ -18,6 +18,9 @@ def create_app():
     from webapp.apis.simulate import simulate
     app.register_blueprint(simulate)
 
+    from webapp.apis.timeseries import timeseries
+    app.register_blueprint(timeseries)
+
     return app
 
 def load_dev():
