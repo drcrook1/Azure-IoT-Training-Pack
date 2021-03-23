@@ -16,14 +16,6 @@ def configure_sim_region():
     DPS_CONN_STR = os.environ["DPS_CONN_STR"]
     replicas = r_json["num_devices"]
     device_deploy_name = os.environ["DEVICE_DEPLOY_NAME"]
-    # read configs
-    # Deploy leafdevice .yaml to aks
-    # Write deployment information to sql
-    # helm deploy
-    # az aks get credentials -n -g
-    # key vault mounting to the correct ~/.kube
-    # just copy to ~/.kube
-    # helm upgrade
     helm_install_cmd = "helm upgrade --install {deploy_name} {helm_chart} {replicas_set} {image_set} {env_set}".format(
                                 deploy_name = device_deploy_name,
                                 helm_chart = helm_chart,

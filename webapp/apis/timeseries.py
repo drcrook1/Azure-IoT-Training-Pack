@@ -23,7 +23,9 @@ def query_kusto(query : str):
     KUSTO_CLUSTER = os.environ["KUSTO_CLUSTER"]
     KUSTO_DATABASE = os.environ["KUSTO_DATABASE"]
 
-    kcsb = KustoConnectionStringBuilder.with_az_cli_authentication(KUSTO_CLUSTER)
+    
+
+    kcsb = KustoConnectionStringBuilder.with_aad_managed_service_identity_authentication(cluster)
     kcsb.authority_id = AAD_TENANT_ID
     kusto_client = KustoClient(kcsb)
     response = kusto_client.execute(KUSTO_DATABASE, query)
