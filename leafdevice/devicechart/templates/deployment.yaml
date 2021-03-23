@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.device.deploy_name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.device.deploy_name }}
+  replicas: {{ .Values.device.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.device.deploy_name }}
+    spec:
+      containers:
+      - name: {{ .Values.device.container_name }}
+        image: {{ .Values.device.image }}
+        imagePullPolicy: Always
+        env:
+        - name: DPSCONNSTR
+          value: {{ .Values.device.env.DPSCONNSTR }}
