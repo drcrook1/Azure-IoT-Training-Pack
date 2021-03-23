@@ -26,3 +26,5 @@ cecho "TEMPORARY - DEPLOYING APPS ON TOP OF INFRA" $magenta
 #
 # Deploy web app to AKS
 #
+cd ../webapp
+helm upgrade --install ftaiotwebapp ./webappchart 
