@@ -45,3 +45,11 @@ output "kube_config_username" {
 output "kube_config_password" {
   value = azurerm_kubernetes_cluster.base.kube_config.0.password
 }
+
+output "kubelet_identity_object_id" {
+  value = azurerm_kubernetes_cluster.base.kubelet_identity.0.object_id
+}
+
+output "acr_name" {
+  value = azurerm_container_registry.base.name
+}

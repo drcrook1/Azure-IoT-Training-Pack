@@ -1,3 +1,4 @@
+/*
 #Public IP
 resource "azurerm_public_ip" "pip" {
         name                           =       "${var.name_prefix}-${var.environment}-${var.region}"
@@ -28,3 +29,5 @@ resource "helm_release" "ingress" {
   }
 
 }
+
+*/

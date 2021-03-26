@@ -18,6 +18,22 @@ resource "azurerm_subnet" "base" {
   virtual_network_name = azurerm_virtual_network.base.name
 }
 
+#user assigned identity
+
+resource "azurerm_user_assigned_identity" "base" {
+  resource_group_name = var.resource_group_name
+  location            = var.region
+  name                = "mi-${var.name_prefix}-${var.environment}-${var.region}"
+}
+
+#role assignment
+
+resource "azurerm_role_assignment" "base" {
+  scope                = azurerm_subnet.base.id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_user_assigned_identity.base.principal_id
+}
+
 #kubernetes_cluster
 
 resource "azurerm_kubernetes_cluster" "base" {
@@ -43,7 +59,8 @@ resource "azurerm_kubernetes_cluster" "base" {
   }
 
   identity {
-    type = "SystemAssigned"
+    type                      = "UserAssigned"
+    user_assigned_identity_id = azurerm_user_assigned_identity.base.id
   }
 
   tags = var.tags
@@ -76,37 +93,87 @@ resource "azurerm_container_registry" "base" {
   admin_enabled       = true
 }
 
-resource "azurerm_role_assignment" "base" {
+resource "azurerm_role_assignment" "acr" {
   scope                            = azurerm_container_registry.base.id
   role_definition_name             = "AcrPull"
-  principal_id                     = azurerm_kubernetes_cluster.base.identity[0].principal_id
+  principal_id                     = azurerm_user_assigned_identity.base.principal_id
   skip_service_principal_aad_check = true
 }
 
-# kube config and helm init
-resource "local_file" "kube_config" {
-  # kube config
-  filename = "kubeconfig"
-  content  = "${azurerm_kubernetes_cluster.base.kube_config_raw}"
+# helm provider
 
-}
-
-# HELM INSTALL
 provider "helm" {
   kubernetes {
-    host = "${azurerm_kubernetes_cluster.base.kube_config.0.host}"
-
-    client_certificate     = "${base64decode(azurerm_kubernetes_cluster.base.kube_config.0.client_certificate)}"
-    client_key             = "${base64decode(azurerm_kubernetes_cluster.base.kube_config.0.client_key)}"
-    cluster_ca_certificate = "${base64decode(azurerm_kubernetes_cluster.base.kube_config.0.cluster_ca_certificate)}"
+    host                   = azurerm_kubernetes_cluster.base.kube_config.0.host
+    client_certificate     = base64decode(azurerm_kubernetes_cluster.base.kube_config.0.client_certificate)
+    client_key             = base64decode(azurerm_kubernetes_cluster.base.kube_config.0.client_key)
+    cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.base.kube_config.0.cluster_ca_certificate)
   }
 }
 
-# CSI DRIVER
-resource "helm_release" "csidriver" {
-  name       = "csi-driver"
+# azure csi driver
 
+resource "helm_release" "csidriver" {
+  depends_on = [azurerm_kubernetes_cluster.base]
+  name       = "csi"
   repository = "https://raw.githubusercontent.com/Azure/secrets-store-csi-driver-provider-azure/master/charts"
   chart      = "csi-secrets-store-provider-azure"
 
+}
+
+data "azurerm_client_config" "current" {
+}
+
+#kubernetes alpha provider
+
+provider "kubernetes-alpha" {
+  host                   = azurerm_kubernetes_cluster.base.kube_config.0.host
+  client_certificate     = base64decode(azurerm_kubernetes_cluster.base.kube_config.0.client_certificate)
+  client_key             = base64decode(azurerm_kubernetes_cluster.base.kube_config.0.client_key)
+  cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.base.kube_config.0.cluster_ca_certificate)
+}
+
+# secrets store provider deployment
+
+resource "kubernetes_manifest" "secrets_store_provider" {
+  provider = kubernetes-alpha
+
+  manifest = {
+    "apiVersion" = "secrets-store.csi.x-k8s.io/v1alpha1"
+    "kind"       = "SecretProviderClass"
+    "metadata" = {
+      "name"      = "${var.key_vault_name}"
+      "namespace" = "default"
+    }
+    "spec" = {
+      "parameters" = {
+        "cloudName"              = "AzurePublicCloud"
+        "keyvaultName"           = "${var.key_vault_name}"
+        "objects"                = <<-EOT
+      array:
+        - |
+          objectName: kubeconfig
+          objectType: secret        # object types: secret, key or cert
+          objectVersion: ""         # [OPTIONAL] object versions, default to latest if empty
+        - |
+          objectName: dps-connection-string
+          objectType: secret
+          objectVersion: ""
+        - |
+          objectName: kusto-cluster
+          objectType: secret
+          objectVersion: ""
+        - |
+          objectName: kusto-database
+          objectType: secret
+          objectVersion: ""
+
+      EOT
+        "tenantId"               = "${data.azurerm_client_config.current.tenant_id}"
+        "useVMManagedIdentity"   = "true"
+        "userAssignedIdentityID" = "${azurerm_kubernetes_cluster.base.kubelet_identity.0.client_id}"
+      }
+      "provider" = "azure"
+    }
+  }
 }

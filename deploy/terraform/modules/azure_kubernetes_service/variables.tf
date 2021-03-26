@@ -1,11 +1,5 @@
 #common
 
-variable "service_name" {
-  description = "Name of the application, service, or workload the resource group is housing."
-  type        = string
-  default     = "aks-cluster"
-}
-
 variable "name_prefix" {
   description = "A short pre-defined text to identify the resource type"
   type        = string
@@ -64,4 +58,9 @@ variable "vm_size" {
   description = "(Required) The size of the Virtual Machine, such as Standard_DS2_v2."
   type        = string
   default     = "Standard_DS2_v2"
+}
+
+variable "key_vault_name" {
+  description = "Name of key vault to use with CSI driver"
+  type        = string
 }

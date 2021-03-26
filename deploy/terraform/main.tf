@@ -14,23 +14,17 @@ resource "random_string" "base" {
 }
 
 module "azure_key_vault" {
-  source               = "./modules/azure_key_vault"
-  environment          = var.environment
-  region               = var.region
-  resource_group_name  = azurerm_resource_group.base.name
-  random_string_result = random_string.base.result
-  tags                 = var.tags
-}
-
-module "azure_sql" {
-  source                       = "./modules/azure_sql"
-  environment                  = var.environment
-  region                       = var.region
-  resource_group_name          = azurerm_resource_group.base.name
-  random_string_result         = random_string.base.result
-  tags                         = var.tags
-  administrator_login          = var.administrator_login
-  administrator_login_password = module.azure_key_vault.sql_password
+  source                 = "./modules/azure_key_vault"
+  environment            = var.environment
+  region                 = var.region
+  resource_group_name    = azurerm_resource_group.base.name
+  random_string_result   = random_string.base.result
+  kube_config            = module.azure_kubernetes_service.kube_config_raw
+  dps_connection_string  = module.azure_iot_hub.dps_connection_string
+  kusto_cluster_uri      = module.azure_data_explorer.data_explorer_cluster_uri
+  kusto_cluster_database = module.azure_data_explorer.database_name
+  kubelet_object_id      = module.azure_kubernetes_service.kubelet_identity_object_id
+  tags                   = var.tags
 }
 
 module "azure_iot_hub" {
@@ -63,4 +57,5 @@ module "azure_kubernetes_service" {
   tags                 = var.tags
   address_space        = var.address_space
   address_prefixes     = var.address_prefixes
+  key_vault_name       = module.azure_key_vault.name
 }
