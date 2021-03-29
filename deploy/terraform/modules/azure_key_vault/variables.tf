@@ -4,12 +4,6 @@
 
 #common
 
-variable "service_name" {
-  description = "Name of the application, service, or workload the resource group is housing."
-  type        = string
-  default     = "iot-keyvault"
-}
-
 variable "name_prefix" {
   description = "A short pre-defined text to identify the resource type"
   type        = string
@@ -33,6 +27,31 @@ variable "resource_group_name" {
 
 variable "random_string_result" {
   description = "The generated random string."
+  type        = string
+}
+
+variable "kube_config" {
+  description = "The generated kubeconfig string."
+  type        = string
+}
+
+variable "dps_connection_string" {
+  description = "The generated dps connection string."
+  type        = string
+}
+
+variable "kusto_cluster_uri" {
+  description = "The generated uri for the adx connection string."
+  type        = string
+}
+
+variable "kusto_cluster_database" {
+  description = "The generated name of the adx database"
+  type        = string
+}
+
+variable "kubelet_object_id" {
+  description = "The User Assigned Managed Identity of the AKS Kubelet"
   type        = string
 }
 

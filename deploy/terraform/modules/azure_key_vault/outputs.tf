@@ -1,3 +1,3 @@
-output "sql_password" {
-  value = random_string.key_vault_secret.result
+output "name" {
+  value = azurerm_key_vault.base.name
 }

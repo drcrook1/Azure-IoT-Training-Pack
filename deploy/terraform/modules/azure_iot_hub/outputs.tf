@@ -9,3 +9,7 @@ output "iothub_consumer_group" {
 output "iothub_id" {
   value = azurerm_iothub.base.id
 }
+
+output "dps_connection_string" {
+  value = azurerm_iothub_dps.base.device_provisioning_host_name
+}

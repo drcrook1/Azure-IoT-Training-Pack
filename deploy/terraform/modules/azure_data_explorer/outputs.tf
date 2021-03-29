@@ -9,3 +9,7 @@ output "data_explorer_cluster_uri" {
 output "data_explorer_data_ingestion_uri" {
   value = azurerm_kusto_cluster.base.data_ingestion_uri
 }
+
+output "database_name" {
+  value = azurerm_kusto_database.base.name
+}

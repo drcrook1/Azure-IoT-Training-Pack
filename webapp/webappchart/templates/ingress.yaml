@@ -25,4 +25,4 @@ spec:
       - path: /
         backend:
           serviceName: {{ .Values.names.service }}
-          servicePort: 80          
+          servicePort: 80
