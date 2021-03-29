@@ -53,6 +53,7 @@ module "azure_kubernetes_service" {
   environment          = var.environment
   region               = var.region
   resource_group_name  = azurerm_resource_group.base.name
+  resource_group_id    = azurerm_resource_group.base.id
   random_string_result = random_string.base.result
   tags                 = var.tags
   address_space        = var.address_space

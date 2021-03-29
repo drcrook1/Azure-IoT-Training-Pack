@@ -18,6 +18,16 @@ resource "azurerm_subnet" "base" {
   virtual_network_name = azurerm_virtual_network.base.name
 }
 
+#ingress pip
+
+resource "azurerm_public_ip" "base" {
+  name                = "pip-${var.name_prefix}-${var.environment}-${var.region}"
+  location            = var.region
+  resource_group_name = azurerm_kubernetes_cluster.base.node_resource_group
+  sku                 = "Standard"
+  allocation_method   = "Static"
+}
+
 #user assigned identity
 
 resource "azurerm_user_assigned_identity" "base" {
@@ -29,7 +39,7 @@ resource "azurerm_user_assigned_identity" "base" {
 #role assignment
 
 resource "azurerm_role_assignment" "base" {
-  scope                = azurerm_subnet.base.id
+  scope                = var.resource_group_id
   role_definition_name = "Network Contributor"
   principal_id         = azurerm_user_assigned_identity.base.principal_id
 }
@@ -121,6 +131,35 @@ resource "helm_release" "csidriver" {
 
 }
 
+# ngninx ingress
+
+resource "helm_release" "ingress" {
+  name  = "ingress-controller"
+  chart = "ingress-nginx/ingress-nginx"
+
+  timeout = 1800
+
+  set {
+    name  = "rbac.create"
+    value = "false"
+  }
+
+  set {
+    name  = "controller.service.loadBalancerIP"
+    value = azurerm_public_ip.base.ip_address
+  }
+
+  set {
+    name  = "controller.replicaCount"
+    value = "1"
+  }
+
+  set {
+    name  = "defaultBackend.enabled"
+    value = "false"
+  }
+
+}
 data "azurerm_client_config" "current" {
 }
 
@@ -136,7 +175,8 @@ provider "kubernetes-alpha" {
 # secrets store provider deployment
 
 resource "kubernetes_manifest" "secrets_store_provider" {
-  provider = kubernetes-alpha
+  depends_on = [azurerm_kubernetes_cluster.base]
+  provider   = kubernetes-alpha
 
   manifest = {
     "apiVersion" = "secrets-store.csi.x-k8s.io/v1alpha1"

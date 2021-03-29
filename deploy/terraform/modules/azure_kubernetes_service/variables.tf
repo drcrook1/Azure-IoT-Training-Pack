@@ -21,6 +21,11 @@ variable "resource_group_name" {
   type        = string
 }
 
+variable "resource_group_id" {
+  description = "(Required) The Name of this Resource Group ID."
+  type        = string
+}
+
 variable "random_string_result" {
   description = "The generated random string."
   type        = string
