@@ -1,79 +1,88 @@
-# Copyright (c) Microsoft. All rights reserved.
-# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+# -------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for
+# license information.
+# --------------------------------------------------------------------------
 
-import random
-import time
+# This sample has been refactored from https://github.com/Azure/azure-iot-sdk-python/blob/master/azure-iot-device/samples/async-hub-scenarios/provision_symmetric_key.py
+
+
+import asyncio, os, uuid, random, time
+from environment_decision import EnvironmentDecisionHelper
 
 # Using the Python Device SDK for IoT Hub:
 #   https://github.com/Azure/azure-iot-sdk-python
-# The sample connects to a device-specific MQTT endpoint on your IoT Hub.
-from azure.iot.device import IoTHubDeviceClient, Message
-
-#
-# Firmware Pre-Loaded Static
-#
-DPS_CONNECTION_STRING = "{DPS_CONN_STR}"
-DEVICE_ID = "{DEVICE_ID}" # Must be globally unique.  Caveat, AKS might kick a device, need a more stateful way to keep this; deploy w/ a file.
+# The sample connects to a device-specific MQTT endpoint on your Azure IoT Hub instance.
+from azure.iot.device.aio import ProvisioningDeviceClient, IoTHubDeviceClient
+from azure.iot.device import Message
 
 
-# The device connection string to authenticate the device with your IoT hub.
-# Using the Azure CLI:
-# az iot hub device-identity show-connection-string --hub-name {YourIoTHubName} --device-id MyNodeDevice --output table
-CONNECTION_STRING = "{Your IoT hub device connection string}"
+EnvironmentDecisionHelper.set_environment_settings()
 
-# Define the JSON message to send to IoT Hub.
-TEMPERATURE = 20.0
-HUMIDITY = 60
-MSG_TXT = '{{"temperature": {temperature},"humidity": {humidity}}}'
+messages_to_send = os.getenv("NUMBER_OF_MESSAGE_TO_SEND")
+provisioning_host = os.getenv("PROVISIONING_HOST")
+id_scope = os.getenv("PROVISIONING_IDSCOPE")
+registration_id = os.getenv("PROVISIONING_REGISTRATION_ID")
+symmetric_key = os.getenv("PROVISIONING_SYMMETRIC_KEY")
+wait_time = os.getenv("MESSAGE_WAIT_TIME")
 
-def initial_boot_up():
-    # check if already initialized w/ DPS & IoT Hub
-    # If so, skip initialization and read in the info from a .json file and load
-    # If not, go to one time initialization
-    return None
+async def main():
 
-def device_one_time_initialization():
-    # load config.json file with DPS & Device Id
-    # register w/ dps
-    # receive iot hub connection info
-    # connect to iot hub
-    return None
+    provisioning_device_client = ProvisioningDeviceClient.create_from_symmetric_key(
+        provisioning_host=provisioning_host,
+        registration_id=registration_id,
+        id_scope=id_scope,
+        symmetric_key=symmetric_key,
+    )
 
-def iothub_client_init():
-    # read .json file with iot hub credentials & device id.
-    # Create an IoT Hub client
-    client = IoTHubDeviceClient.create_from_connection_string(CONNECTION_STRING)
-    return client
+    registration_result = await provisioning_device_client.register()
 
-def iothub_client_telemetry_sample_run():
-    try:
-        client = iothub_client_init()
-        print ( "IoT Hub device sending periodic messages, press Ctrl-C to exit" )
+    print(f"The complete registration result is: {registration_result.registration_state}")
 
-        while True:
-            # Build the message with simulated telemetry values.
-            temperature = TEMPERATURE + (random.random() * 15)
-            humidity = HUMIDITY + (random.random() * 20)
-            msg_txt_formatted = MSG_TXT.format(temperature=temperature, humidity=humidity)
+    if registration_result.status == "assigned":
+        print("Will send telemetry from the provisioned device")
+        device_client = IoTHubDeviceClient.create_from_symmetric_key(
+            symmetric_key=symmetric_key,
+            hostname=registration_result.registration_state.assigned_hub,
+            device_id=registration_result.registration_state.device_id,
+        )
+        # Connect the client.
+        await device_client.connect()
+
+        async def send_test_message(i):
+
+            temperature = 20 + (random.random() * 15)
+            humidity =  60 + (random.random() * 20)
+            
+            # Define the JSON message to send to IoT Hub.
+            msg_txt = '{{"temperature": {temperature},"humidity": {humidity}}}'
+            msg_txt_formatted = msg_txt.format(temperature=temperature, humidity=humidity)
             message = Message(msg_txt_formatted)
 
-            # Add a custom application property to the message.
+            # Adding a custom application property to the message.
             # An IoT hub can filter on these properties without access to the message body.
             if temperature > 30:
-              message.custom_properties["temperatureAlert"] = "true"
+                message.custom_properties["temperatureAlert"] = "true"
             else:
-              message.custom_properties["temperatureAlert"] = "false"
+                message.custom_properties["temperatureAlert"] = "false"
 
-            # Send the message.
-            print( "Sending message: {}".format(message) )
-            client.send_message(message)
-            print ( "Message successfully sent" )
-            time.sleep(1)
+            print("Sending message: {}".format(message))
 
-    except KeyboardInterrupt:
-        print ( "IoTHubClient sample stopped" )
+            message.message_id = uuid.uuid4()
+            await device_client.send_message(message)
 
-if __name__ == '__main__':
-    print ( "IoT Hub Quickstart #1 - Simulated device" )
-    print ( "Press Ctrl-C to exit" )
-    iothub_client_telemetry_sample_run()
+            print(f"Completed sending message message # {i}")
+
+            time.sleep(int(wait_time))
+
+        # send `messages_to_send` messages concurrently
+        await asyncio.gather(*[send_test_message(i) for i in range(1, int(messages_to_send) + 1)])
+
+        # finally, disconnect
+        await device_client.disconnect()
+    else:
+        print("Can not send telemetry from the provisioned device")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
