@@ -1,7 +1,0 @@
-device:
-  deploy_name: "leaf_device"
-  replicas: 0
-  container_name: "leaf_device"
-  image: "myacr/image:tag"
-  env:
-    DPSCONNSTR: "your_dps_conn_str"

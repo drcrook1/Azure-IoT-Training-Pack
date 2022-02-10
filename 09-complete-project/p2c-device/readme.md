@@ -1,0 +1,1 @@
+The code here should include a deployment configuration that allows it to point to the IoT Edge acting as a Transparent Gateway OR at the IoT Hub itself.
