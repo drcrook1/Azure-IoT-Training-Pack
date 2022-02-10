@@ -1,0 +1,1 @@
+This is a device that does not communicate via HTTP/MQTT etc, do what you want here it just needs to have bi-directional communications and the iot edge protocol translator translates between iot hub and this thing.

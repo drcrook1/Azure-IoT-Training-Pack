@@ -7,3 +7,4 @@ Deployed Components
 *    Azure Container Instance (for leaf device)
 *    Vnet w/ 3 VMs where ONLY one VM can communicate out of it to IoT Hub (for gateway patterns)
 *    App Service (for cert issuer)
+*    Key Vaults (unique key vault for dev, qa & prod)
